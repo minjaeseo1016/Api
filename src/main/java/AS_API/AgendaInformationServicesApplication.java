@@ -1,4 +1,4 @@
-package com.example.Agenda_Information_Services;
+package AS_API;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
