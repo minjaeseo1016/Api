@@ -1,4 +1,4 @@
-package com.example.Agenda_Information_Services;
+package AS_API;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
