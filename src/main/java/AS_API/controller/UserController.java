@@ -37,13 +37,16 @@ public class UserController {
                 switch (field) {
                     case "email":
                         throw new CustomException(ErrorCode.USER_EMAIL_INVALID);
-                    case "pas   sword":
+                    case "password": // 오타 수정: "pas   sword" -> "password"
                         throw new CustomException(ErrorCode.USER_PASSWORD_INVALID);
+                    case "nickName":
+                        throw new CustomException(ErrorCode.USER_NICKNAME_INVALID); // 닉네임 예외 추가
                     default:
                         throw new CustomException(ErrorCode.USER_INVALID_INPUT);
                 }
             }
         }
+
 
         try{
             User user = User.createUser(userRegisterDto, passwordEncoder);
