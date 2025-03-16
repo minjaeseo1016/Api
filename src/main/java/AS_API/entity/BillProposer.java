@@ -1,7 +1,7 @@
 package AS_API.entity;
 
 import jakarta.persistence.*;
-
+import java.util.List;
 
 @Entity
 @Table(name = "BillProposer")
@@ -10,16 +10,30 @@ public class BillProposer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long proposerId;
 
-    @ManyToOne
-    @JoinColumn(name = "billId", nullable = false)
-    private Bill bill;
-
     @Column(nullable = false, length = 255)
     private String proposerName;
 
-    @Column(nullable = false, length = 255)
-    private String career;
+    @Column(nullable = true)
+    private String bth;
 
-    @Column(nullable = false, length = 255)
-    private String party;
+    @Column(nullable = true, length = 255)
+    private String job;
+
+    @Column(nullable = true, length = 255)
+    private String poly;
+
+    @Column(nullable = true, length = 255)
+    private String orig;
+
+    @Column(nullable = true, length = 255)
+    private String cmits;
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String memTitle;
+
+    @OneToMany(mappedBy = "proposer", cascade = CascadeType.ALL)
+    private List<Bill> bills;
+
+    @OneToMany(mappedBy = "proposer", cascade = CascadeType.ALL)
+    private List<BillStatus> billStatuses;
 }

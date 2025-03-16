@@ -10,33 +10,40 @@ public class Bill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long billId;
 
+    @ManyToOne
+    @JoinColumn(name = "proposerId", nullable = false)
+    private BillProposer proposer;
+
     @Column(nullable = false, length = 255)
     private String apiId;
 
     @Column(nullable = false)
     private Long billNumber;
 
-    @Column(nullable = false)  // 기본값: VARCHAR(255)
+    @Column(nullable = true, length = 255)
     private String billTitle;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = true, length = 255)
     private String billProposer;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = true, length = 255)
     private String committee;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = true, length = 255)
     private String billStatus;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime billDate;
 
-    @Column(nullable = false, columnDefinition = "TEXT")  // 긴 텍스트 저장
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String detail;
 
-    @Column(nullable = false, columnDefinition = "TEXT")  // 긴 텍스트 저장
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String summary;
 
-    @Column(nullable = false, columnDefinition = "TEXT")  // 긴 텍스트 저장
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String prediction;
+
+    @OneToOne(mappedBy = "bill", cascade = CascadeType.ALL)
+    private BillStatus billStatusDetail;
 }
