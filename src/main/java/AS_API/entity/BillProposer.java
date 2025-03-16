@@ -1,11 +1,17 @@
 package AS_API.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 @Entity
 @Table(name = "BillProposer")
+@Getter
+@NoArgsConstructor
 public class BillProposer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long proposerId;
