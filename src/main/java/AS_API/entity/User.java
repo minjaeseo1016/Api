@@ -40,7 +40,7 @@ public class User {
     private Role role;
 
     @Column(nullable = false)
-    private boolean userRentalStatus;
+    private String nickName;
 
     public static User createUser(UserRegisterDto userRegisterDto, PasswordEncoder passwordEncoder){
         String password = passwordEncoder.encode(userRegisterDto.getPassword());
@@ -51,6 +51,7 @@ public class User {
                 .password(password)
                 .phoneNumber(userRegisterDto.getPhoneNumber())
                 .email(userRegisterDto.getEmail())
+                .nickName(userRegisterDto.getNickName())
                 .role(Role.USER)
                 .build();
 

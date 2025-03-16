@@ -25,4 +25,9 @@ public class UserRegisterDto {
     @NotBlank(message = "이메일은 필수 입력 값입니다")
     @Email(message = "이메일 형식으로 입력해주세요")
     private String email;
+
+    @NotBlank
+    @Size(min = 2, max = 15, message = "닉네임은 2자 이상 15자 이하로 입력해주세요.")
+    private String nickName;
+
 }
