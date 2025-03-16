@@ -1,10 +1,12 @@
 package AS_API.entity;
 
+import AS_API.dto.UserRegisterDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -39,4 +41,19 @@ public class User {
 
     @Column(nullable = false)
     private boolean userRentalStatus;
+
+    public static User createUser(UserRegisterDto userRegisterDto, PasswordEncoder passwordEncoder){
+        String password = passwordEncoder.encode(userRegisterDto.getPassword());
+
+        User user = User.builder()
+                .uid(userRegisterDto.getUid())
+                .name(userRegisterDto.getName())
+                .password(password)
+                .phoneNumber(userRegisterDto.getPhoneNumber())
+                .email(userRegisterDto.getEmail())
+                .role(Role.USER)
+                .build();
+
+        return user;
+    }
 }
