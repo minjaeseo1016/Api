@@ -1,5 +1,6 @@
 package AS_API.controller;
 
+import AS_API.config.CustomUserDetails;
 import AS_API.dto.UserRegisterDto;
 import AS_API.exception.CustomException;
 import AS_API.exception.ErrorCode;
@@ -7,15 +8,18 @@ import AS_API.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import AS_API.entity.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
+
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,10 +41,10 @@ public class UserController {
                 switch (field) {
                     case "email":
                         throw new CustomException(ErrorCode.USER_EMAIL_INVALID);
-                    case "password": // 오타 수정: "pas   sword" -> "password"
+                    case "password":
                         throw new CustomException(ErrorCode.USER_PASSWORD_INVALID);
                     case "nickName":
-                        throw new CustomException(ErrorCode.USER_NICKNAME_INVALID); // 닉네임 예외 추가
+                        throw new CustomException(ErrorCode.USER_NICKNAME_INVALID);
                     default:
                         throw new CustomException(ErrorCode.USER_INVALID_INPUT);
                 }
@@ -62,4 +66,26 @@ public class UserController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+    @DeleteMapping("/api/users/{userId}")
+    public @ResponseBody ResponseEntity<Object> deleteUser(@PathVariable("userId") Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long loginUserId = userDetails.getUser().getUserId();
+
+        if (!userId.equals(loginUserId)) {
+            throw new CustomException(ErrorCode.NO_PERMISSION);
+        }
+
+        userService.deleteUser(userId);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "회원 탈퇴가 완료되었습니다");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+
 }
