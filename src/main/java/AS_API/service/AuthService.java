@@ -44,14 +44,11 @@ public class AuthService {
             throw new CustomException(LOGIN_INFO_INVALID);
         }
 
-        // 🔹 UserDetails 객체를 명시적으로 생성하여 사용
         CustomUserDetails userDetails = new CustomUserDetails(user);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, loginRequestDto.getPassword(), userDetails.getAuthorities()
         );
 
-        // 🔹 authenticationManager.authenticate() 제거 후 직접 사용
-        // authenticationManager.authenticate(authentication); ❌ 제거
 
         String token = tokenProvider.generateAccessToken(authentication);
 

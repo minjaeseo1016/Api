@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @Transactional
@@ -27,4 +29,23 @@ public class UserService {
             throw new CustomException(ErrorCode.USER_ALREADY_EXIST);
         }
     }
+
+
+    public User findUserByUid(String uid) {
+        User user = userRepository.findByUid(uid);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+        return user;
+    }
+
+    public void deleteUser(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            userRepository.deleteById(userId);
+        } else {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+    }
+
 }
