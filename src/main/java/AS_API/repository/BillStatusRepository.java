@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface BillStatusRepository extends JpaRepository<BillStatus, Long> {
 
     @Query("SELECT new AS_API.dto.BillRankingDto(" +
@@ -20,6 +22,8 @@ public interface BillStatusRepository extends JpaRepository<BillStatus, Long> {
             "FROM BillStatus bs " +
             "ORDER BY bs.bookmarkCount DESC, bs.billCount DESC")
     Page<BillRankingDto> findAllRankedByBookmark(Pageable pageable);
+
+    Optional<BillStatus> findByBill_BillId(Long billId);
 
 
 }
