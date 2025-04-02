@@ -2,12 +2,15 @@ package AS_API.controller;
 
 import AS_API.config.CustomUserDetails;
 import AS_API.dto.UserRegisterDto;
+import AS_API.dto.UserResponseDto;
 import AS_API.exception.CustomException;
 import AS_API.exception.ErrorCode;
 import AS_API.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import AS_API.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -86,6 +89,21 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/api/admin/users")
+    public ResponseEntity<Page<UserResponseDto>> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<UserResponseDto> usersPage = userService.getAllUsers(pageRequest);
+        return ResponseEntity.ok(usersPage);
+    }
+
+    @GetMapping("/api/admin/users/{userId}")
+    public ResponseEntity<UserResponseDto> getUserDetail(@PathVariable Long userId) {
+        UserResponseDto userDetail = userService.getUserDetailById(userId);
+        return ResponseEntity.ok(userDetail);
+    }
 
 
 }
