@@ -1,9 +1,13 @@
 package AS_API.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "BillStatus")
+@NoArgsConstructor
+@Getter
 public class BillStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
