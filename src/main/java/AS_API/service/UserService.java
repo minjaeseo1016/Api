@@ -1,5 +1,6 @@
 package AS_API.service;
 
+import AS_API.dto.UserProfileUpdateDto;
 import AS_API.dto.UserResponseDto;
 import AS_API.exception.CustomException;
 import AS_API.exception.ErrorCode;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,6 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public void registerUser(User user){
         validateDuplicateUser(user);
@@ -61,5 +64,36 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return new UserResponseDto(user);
+    }
+
+    public void updateUserProfile(Long userId, UserProfileUpdateDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 현재 비밀번호 확인
+        if (dto.getCurrentPassword() == null || !passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.USER_PASSWORD_MISMATCH);
+        }
+
+        boolean changed = false;
+
+        // 새 비밀번호 변경
+        if (dto.getNewPassword() != null && !dto.getNewPassword().isBlank()) {
+            String encoded = passwordEncoder.encode(dto.getNewPassword());
+            user.updatePassword(encoded);
+            changed = true;
+        }
+
+        // 닉네임 변경
+        if (dto.getNewNickName() != null && !dto.getNewNickName().isBlank()) {
+            user.updateNickName(dto.getNewNickName());
+            changed = true;
+        }
+
+        if (!changed) {
+            throw new CustomException(ErrorCode.NO_UPDATE_FIELD);
+        }
+
+        userRepository.save(user);
     }
 }

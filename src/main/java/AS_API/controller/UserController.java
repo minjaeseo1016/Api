@@ -1,6 +1,7 @@
 package AS_API.controller;
 
 import AS_API.config.CustomUserDetails;
+import AS_API.dto.UserProfileUpdateDto;
 import AS_API.dto.UserRegisterDto;
 import AS_API.dto.UserResponseDto;
 import AS_API.exception.CustomException;
@@ -105,5 +106,19 @@ public class UserController {
         return ResponseEntity.ok(userDetail);
     }
 
+
+    @PutMapping("/api/update/profile")
+    public ResponseEntity<?> updateProfile(@RequestBody UserProfileUpdateDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getUser().getUserId();
+
+        userService.updateUserProfile(userId, dto);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "프로필이 성공적으로 수정되었습니다");
+
+        return ResponseEntity.ok(response);
+    }
 
 }
