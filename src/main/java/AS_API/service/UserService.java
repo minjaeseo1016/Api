@@ -1,5 +1,6 @@
 package AS_API.service;
 
+import AS_API.dto.UserResponseDto;
 import AS_API.exception.CustomException;
 import AS_API.exception.ErrorCode;
 import AS_API.repository.UserRepository;
@@ -7,6 +8,8 @@ import AS_API.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -48,4 +51,15 @@ public class UserService {
         }
     }
 
+    public Page<UserResponseDto> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(UserResponseDto::fromSimple);
+    }
+
+
+    public UserResponseDto getUserDetailById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return new UserResponseDto(user);
+    }
 }
