@@ -16,4 +16,9 @@ public class BillStatusService {
     public Page<BillRankingDto> getBillRanking(Pageable pageable) {
         return billStatusRepository.findAllRanked(pageable);
     }
+
+    public Page<BillRankingDto> getBookmarkRanking(Pageable pageable) {
+        return billStatusRepository.findAllRankedByBookmark(pageable);
+    }
+
 }

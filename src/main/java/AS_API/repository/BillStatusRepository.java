@@ -15,4 +15,11 @@ public interface BillStatusRepository extends JpaRepository<BillStatus, Long> {
             "ORDER BY bs.billCount DESC")
     Page<BillRankingDto> findAllRanked(Pageable pageable);
 
+    @Query("SELECT new AS_API.dto.BillRankingDto(" +
+            "bs.bill.billId, bs.bill.billTitle, bs.bill.billProposer, bs.billCount, bs.bookmarkCount) " +
+            "FROM BillStatus bs " +
+            "ORDER BY bs.bookmarkCount DESC, bs.billCount DESC")
+    Page<BillRankingDto> findAllRankedByBookmark(Pageable pageable);
+
+
 }

@@ -25,4 +25,14 @@ public class BillStatusController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "billCount"));
         return ResponseEntity.ok(billStatusService.getBillRanking(pageable));
     }
+
+    @GetMapping("/ranking/bookmark")
+    public ResponseEntity<Page<BillRankingDto>> getBookmarkRanking(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(billStatusService.getBookmarkRanking(pageable));
+    }
+
 }
