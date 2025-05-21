@@ -1,5 +1,6 @@
 package AS_API.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ public class BillStatus {
     private Long documentId;
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "billId", nullable = false)
     private Bill bill;
 
