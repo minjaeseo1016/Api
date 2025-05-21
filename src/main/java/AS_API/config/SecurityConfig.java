@@ -39,7 +39,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/register", "/api/login", "/api/createAdmin").permitAll()
                                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .requestMatchers("/api/mypage/**", "api/users/**", "api/bills/**",
-                                        "/api/proposers/**", "/api/logout", "/api/posts/**").authenticated()
+                                        "/api/proposers/**", "/api/logout", "/api/posts/**","/api/recommend").authenticated()
                                 .anyRequest().permitAll()
                 )
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
