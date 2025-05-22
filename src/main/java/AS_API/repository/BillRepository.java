@@ -30,14 +30,6 @@ public interface BillRepository extends JpaRepository<Bill, Long> {
             "FROM Bill b WHERE b.billId = :billId")
     Optional<BillDetailDto> findBillDetailById(@Param("billId") Long billId);
 
-    @Query(value = """
-        SELECT * FROM Bill
-        ORDER BY DISTANCE(
-            STRING_TO_VECTOR(:queryVector),
-            embedding,
-            'COSINE'
-        )
-        LIMIT :limit
-    """, nativeQuery = true)
-    List<Bill> findSimilarBills(@Param("queryVector") String queryVectorJson, @Param("limit") int limit);
+    @Query(value = "SELECT * FROM Bill LIMIT :limit", nativeQuery = true)
+    List<Bill> findTopCandidates(@Param("limit") int limit);
 }
