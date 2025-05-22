@@ -23,7 +23,7 @@ public class RecommendationService {
         float[] queryEmbedding = embeddingService.getNormalizedEmbedding(text);
 
         List<Map.Entry<Long, Double>> scored = embeddingCache.getEmbeddingMap().entrySet().stream()
-                .map(entry -> Map.entry(entry.getKey(), cosineSimilarity(queryEmbedding, entry.getValue())))
+                .map(entry -> Map.entry(entry.getKey(), dotProduct(queryEmbedding, entry.getValue())))
                 .filter(e -> !Double.isNaN(e.getValue()))
                 .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
                 .limit(limit)
@@ -36,16 +36,13 @@ public class RecommendationService {
         return topBills.stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    private double cosineSimilarity(float[] a, float[] b) {
+    private double dotProduct(float[] a, float[] b) {
         if (a.length != b.length) return Double.NaN;
-        double dot = 0, normA = 0, normB = 0;
+        double sum = 0;
         for (int i = 0; i < a.length; i++) {
-            dot += a[i] * b[i];
-            normA += a[i] * a[i];
-            normB += b[i] * b[i];
+            sum += a[i] * b[i];
         }
-        if (normA == 0 || normB == 0) return Double.NaN;
-        return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+        return sum;
     }
 
     private BillDto toDto(Bill bill) {
