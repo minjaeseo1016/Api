@@ -33,9 +33,28 @@ public class RecommendationService {
         }
 
         top.sort(Comparator.comparingDouble(Score::score).reversed());
-        List<Long> topIds = top.stream().limit(limit).map(Score::id).toList();
+
+        List<Long> topIds = top.stream()
+                .limit(limit)
+                .map(Score::id)
+                .toList();
+
         List<Bill> topBills = billRepository.findAllById(topIds);
-        return topBills.stream().map(this::toDto).toList();
+
+        // ✅ 순서 보존을 위해 billId → Bill 맵핑
+        Map<Long, Bill> billMap = new HashMap<>();
+        for (Bill bill : topBills) {
+            billMap.put(bill.getBillId(), bill);
+        }
+
+        // ✅ 원래 유사도 순서(topIds 기준)로 BillDto 정렬
+        List<BillDto> result = new ArrayList<>();
+        for (Long id : topIds) {
+            Bill b = billMap.get(id);
+            if (b != null) result.add(toDto(b));
+        }
+
+        return result;
     }
 
     private double dot(float[] a, float[] b) {
