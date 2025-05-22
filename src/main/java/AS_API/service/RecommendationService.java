@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,28 +19,28 @@ public class RecommendationService {
     private final BillRepository billRepository;
 
     public List<BillDto> recommendByText(String text, int limit) throws IOException, InterruptedException {
-        float[] queryEmbedding = embeddingService.getNormalizedEmbedding(text);
+        float[] query = embeddingService.getNormalizedEmbedding(text);
+        float[][] vectors = embeddingCache.getVectors();
+        List<Long> ids = embeddingCache.getIds();
 
-        List<Map.Entry<Long, Double>> scored = embeddingCache.getEmbeddingMap().entrySet().stream()
-                .map(entry -> Map.entry(entry.getKey(), dotProduct(queryEmbedding, entry.getValue())))
-                .filter(e -> !Double.isNaN(e.getValue()))
-                .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
-                .limit(limit)
-                .collect(Collectors.toList());
+        List<Score> top = new ArrayList<>();
+        for (int i = 0; i < vectors.length; i++) {
+            float[] v = vectors[i];
+            double score = dot(query, v);
+            if (score >= 0.3) {
+                top.add(new Score(ids.get(i), score));
+            }
+        }
 
-        List<Bill> topBills = billRepository.findAllById(
-                scored.stream().map(Map.Entry::getKey).toList()
-        );
-
-        return topBills.stream().map(this::toDto).collect(Collectors.toList());
+        top.sort(Comparator.comparingDouble(Score::score).reversed());
+        List<Long> topIds = top.stream().limit(limit).map(Score::id).toList();
+        List<Bill> topBills = billRepository.findAllById(topIds);
+        return topBills.stream().map(this::toDto).toList();
     }
 
-    private double dotProduct(float[] a, float[] b) {
-        if (a.length != b.length) return Double.NaN;
+    private double dot(float[] a, float[] b) {
         double sum = 0;
-        for (int i = 0; i < a.length; i++) {
-            sum += a[i] * b[i];
-        }
+        for (int i = 0; i < a.length; i++) sum += a[i] * b[i];
         return sum;
     }
 
@@ -56,4 +55,6 @@ public class RecommendationService {
                 bill.getBillStatus()
         );
     }
+
+    private record Score(Long id, double score) {}
 }
