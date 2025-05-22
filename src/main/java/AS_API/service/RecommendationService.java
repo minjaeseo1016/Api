@@ -20,7 +20,7 @@ public class RecommendationService {
     private final BillRepository billRepository;
 
     public List<BillDto> recommendByText(String text, int limit) throws IOException, InterruptedException {
-        float[] queryEmbedding = embeddingService.getEmbedding(text);
+        float[] queryEmbedding = embeddingService.getNormalizedEmbedding(text);
 
         List<Map.Entry<Long, Double>> scored = embeddingCache.getEmbeddingMap().entrySet().stream()
                 .map(entry -> Map.entry(entry.getKey(), cosineSimilarity(queryEmbedding, entry.getValue())))
