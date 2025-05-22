@@ -59,6 +59,7 @@ public class Bill {
     @JsonIgnore
     private BillStatus billStatusDetail;
 
+    @Basic(fetch = FetchType.EAGER)
     @Column(columnDefinition = "vector(1536)", nullable = false)
     private byte[] embedding;
 
