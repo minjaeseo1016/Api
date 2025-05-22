@@ -52,10 +52,15 @@ public class OpenAiEmbeddingService {
         }
 
         float[] result = new float[embeddingNode.size()];
+        float norm = 0f;
         for (int i = 0; i < embeddingNode.size(); i++) {
             result[i] = embeddingNode.get(i).floatValue();
+            norm += result[i] * result[i];
         }
-
+        norm = (float) Math.sqrt(norm);
+        for (int i = 0; i < result.length; i++) {
+            result[i] /= norm; // 정규화
+        }
         return result;
     }
 }
