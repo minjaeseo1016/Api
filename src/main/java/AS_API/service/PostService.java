@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +20,6 @@ public class PostService {
     private final PostRepository postRepository;
 
     public PostResponseDto createPost(PostRequestDto dto) {
-        System.out.println("createPost() called with title: " + dto.getPostTitle());
-
         if (dto.getParentPostId() != null) {
             int depth = getPostDepth(dto.getParentPostId(), 1);
             if (depth >= 3) {
@@ -37,20 +37,21 @@ public class PostService {
                 .build();
 
         Post saved = postRepository.save(post);
-        System.out.println("Post saved with ID: " + saved.getPostId());
-
         return toDto(saved);
     }
 
     public PostResponseDto getPost(Long id) {
-        System.out.println("getPost() called with ID: " + id);
-
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-
         post.increaseViewCount();
-
         return toDto(post);
+    }
+
+    public List<PostResponseDto> getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return posts.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     private PostResponseDto toDto(Post p) {

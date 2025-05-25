@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
 
@@ -23,5 +25,9 @@ public class PostController {
     public ResponseEntity<PostResponseDto> getPost(@PathVariable Long id) {
         return ResponseEntity.ok(postService.getPost(id));
     }
-    
+
+    @GetMapping
+    public ResponseEntity<List<PostResponseDto>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
+    }
 }
