@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +55,13 @@ public class CommentService {
         }
 
         return roots;
+    }
+
+    public List<CommentResponseDto> getCommentsByPostId(Long postId) {
+        return commentRepository.findByPostId(postId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     private CommentResponseDto toDto(Comment c) {
