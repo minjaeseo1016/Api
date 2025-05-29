@@ -3,71 +3,71 @@ package AS_API.service;
 import AS_API.dto.PostRequestDto;
 import AS_API.dto.PostResponseDto;
 import AS_API.entity.Post;
+import AS_API.entity.User;
 import AS_API.repository.PostRepository;
+import AS_API.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
-    public PostResponseDto createPost(PostRequestDto dto) {
-        if (dto.getParentPostId() != null) {
-            int depth = getPostDepth(dto.getParentPostId(), 1);
-            if (depth >= 3) {
-                throw new RuntimeException("3단계 이상 스레드는 허용되지 않습니다.");
-            }
-        }
+    public void createPost(Long userId, PostRequestDto dto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         Post post = Post.builder()
-                .parentPostId(dto.getParentPostId())
-                .userId(dto.getUserId())
-                .postTitle(dto.getPostTitle())
-                .content(dto.getContent())
-                .postCount(0)
-                .postDate(LocalDateTime.now())
-                .build();
+            .user(user)
+            .postTitle(dto.getPostTitle())
+            .content(dto.getContent())
+            .postCount(0)
+            .build();
 
-        Post saved = postRepository.save(post);
-        return toDto(saved);
-    }
-
-    public PostResponseDto getPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-        post.increaseViewCount();
-        return toDto(post);
+        postRepository.save(post);
     }
 
     public List<PostResponseDto> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        return posts.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+        return postRepository.findAll().stream()
+            .map(post -> PostResponseDto.builder()
+                .postId(post.getPostId())
+                .postTitle(post.getPostTitle())
+                .content(post.getContent())
+                .postCount(post.getPostCount())
+                .postDate(post.getPostDate())
+                .build())
+            .collect(Collectors.toList());
     }
 
-    private PostResponseDto toDto(Post p) {
+    public PostResponseDto getPostById(Long postId) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
         return PostResponseDto.builder()
-                .postId(p.getPostId())
-                .parentPostId(p.getParentPostId())
-                .userId(p.getUserId())
-                .postTitle(p.getPostTitle())
-                .content(p.getContent())
-                .postCount(p.getPostCount())
-                .postDate(p.getPostDate())
-                .build();
+            .postId(post.getPostId())
+            .postTitle(post.getPostTitle())
+            .content(post.getContent())
+            .postCount(post.getPostCount())
+            .postDate(post.getPostDate())
+            .build();
     }
 
-    private int getPostDepth(Long parentId, int depth) {
-        Post parent = postRepository.findById(parentId).orElseThrow();
-        return parent.getParentPostId() == null ? depth : getPostDepth(parent.getParentPostId(), depth + 1);
+    
+    public List<PostResponseDto> getMyPosts(Long userId) {
+        return postRepository.findByUser_UserId(userId).stream()
+            .map(post -> PostResponseDto.builder()
+                .postId(post.getPostId())
+                .postTitle(post.getPostTitle())
+                .content(post.getContent())
+                .postCount(post.getPostCount())
+                .postDate(post.getPostDate())
+                .build())
+            .collect(Collectors.toList());
     }
 }
