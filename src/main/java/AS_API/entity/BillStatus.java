@@ -43,6 +43,18 @@ public class BillStatus {
         this.no = no;
     }
 
+    // 북마크 수 증가
+    public void increaseBookmarkCount() {
+        this.bookmarkCount += 1;
+    }
+
+    // 북마크 수 감소
+    public void decreaseBookmarkCount() {
+        if (this.bookmarkCount > 0) {
+            this.bookmarkCount -= 1;
+        }
+    }
+
 }
 
 
