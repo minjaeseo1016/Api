@@ -1,77 +1,77 @@
 package AS_API.service;
 
 import AS_API.dto.CommentRequestDto;
-import AS_API.dto.CommentResponseDto;
 import AS_API.dto.CommentTreeDto;
 import AS_API.entity.Comment;
+import AS_API.entity.Post;
+import AS_API.entity.User;
 import AS_API.repository.CommentRepository;
+import AS_API.repository.PostRepository;
+import AS_API.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
-    public CommentResponseDto createComment(CommentRequestDto dto) {
+    public void createComment(Long userId, CommentRequestDto dto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        Post post = postRepository.findById(dto.getPostId())
+            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
         Comment comment = Comment.builder()
-                .postId(dto.getPostId())
-                .parentCommentId(dto.getParentCommentId())
-                .userId2(dto.getUserId2())
-                .commentContent(dto.getCommentContent())
-                .createdAt(LocalDateTime.now())
-                .build();
+            .user(user)
+            .post(post)
+            .parentCommentId(dto.getParentCommentId()) 
+            .commentContent(dto.getCommentContent())
+            .build();
 
-        Comment saved = commentRepository.save(comment);
-        return toDto(saved);
+        commentRepository.save(comment);
     }
 
-    public List<CommentTreeDto> getCommentTree(Long postId) {
-        List<Comment> all = commentRepository.findByPostId(postId);
+    public List<CommentTreeDto> getCommentsByPostId(Long postId) {
+        List<Comment> comments = commentRepository.findByPost_PostId(postId);
+
+     
+        List<CommentTreeDto> flatList = comments.stream()
+            .map(CommentTreeDto::new)
+            .collect(Collectors.toList());
+
+
+        return buildCommentTree(flatList);
+    }
+
+    private List<CommentTreeDto> buildCommentTree(List<CommentTreeDto> flatList) {
         Map<Long, CommentTreeDto> map = new HashMap<>();
         List<CommentTreeDto> roots = new ArrayList<>();
 
-        for (Comment c : all) {
-            CommentTreeDto dto = new CommentTreeDto(c);
-            map.put(c.getCommentId(), dto);
+        for (CommentTreeDto dto : flatList) {
+            map.put(dto.getCommentId(), dto);
         }
 
-        for (Comment c : all) {
-            if (c.getParentCommentId() == null) {
-                roots.add(map.get(c.getCommentId()));
+       
+        for (CommentTreeDto dto : flatList) {
+            Long parentId = dto.getParentCommentId();
+            if (parentId == null) {
+                roots.add(dto); 
             } else {
-                CommentTreeDto parent = map.get(c.getParentCommentId());
+                CommentTreeDto parent = map.get(parentId);
                 if (parent != null) {
-                    parent.getChildren().add(map.get(c.getCommentId()));
+                    parent.getChildren().add(dto); 
                 }
             }
         }
 
         return roots;
-    }
-
-    public List<CommentResponseDto> getCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId)
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
-    private CommentResponseDto toDto(Comment c) {
-        return CommentResponseDto.builder()
-                .commentId(c.getCommentId())
-                .postId(c.getPostId())
-                .parentCommentId(c.getParentCommentId())
-                .userId2(c.getUserId2())
-                .commentContent(c.getCommentContent())
-                .createdAt(c.getCreatedAt())
-                .build();
     }
 }

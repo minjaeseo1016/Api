@@ -16,9 +16,9 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
 
-    private Long parentPostId;  // null이면 최상위 글
-
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String postTitle;
 
@@ -31,5 +31,10 @@ public class Post {
 
     public void increaseViewCount() {
         this.postCount += 1;
+    }
+
+    @PrePersist
+    public void onCreate() {
+        this.postDate = LocalDateTime.now();
     }
 }
