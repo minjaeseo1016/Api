@@ -55,6 +55,9 @@ public class BillStatus {
         }
     }
 
+    public void increaseBillCount() {
+        this.billCount += 1;
+    }
 }
 
 
