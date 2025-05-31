@@ -41,13 +41,11 @@ public class RecommendationService {
 
         List<Bill> topBills = billRepository.findAllById(topIds);
 
-        // ✅ 순서 보존을 위해 billId → Bill 맵핑
         Map<Long, Bill> billMap = new HashMap<>();
         for (Bill bill : topBills) {
             billMap.put(bill.getBillId(), bill);
         }
 
-        // ✅ 원래 유사도 순서(topIds 기준)로 BillDto 정렬
         List<BillDto> result = new ArrayList<>();
         for (Long id : topIds) {
             Bill b = billMap.get(id);
@@ -71,7 +69,8 @@ public class RecommendationService {
                 bill.getBillTitle(),
                 bill.getBillProposer(),
                 bill.getCommittee(),
-                bill.getBillStatus()
+                bill.getBillStatus(),
+                bill.getProposer().getPoly()
         );
     }
 

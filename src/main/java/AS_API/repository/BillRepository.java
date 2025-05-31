@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface BillRepository extends JpaRepository<Bill, Long> {
 
     @Query("SELECT new AS_API.dto.BillDto(b.billId, b.apiId, b.billNumber, b.billTitle, " +
-            "b.billProposer, b.committee, b.billStatus) " +
+            "b.billProposer, b.committee, b.billStatus, b.proposer.poly) " +
             "FROM Bill b " +
             "WHERE (:title IS NOT NULL AND b.billTitle LIKE CONCAT('%', :title, '%') OR :title IS NULL) " +
             "AND (:proposer IS NOT NULL AND b.billProposer LIKE CONCAT('%', :proposer, '%') OR :proposer IS NULL) " +
