@@ -38,4 +38,17 @@ public class RecommendationController {
             return ResponseEntity.status(500).body("추천 처리 중 오류: " + e.getMessage());
         }
     }
+
+    @PostMapping("/user")
+    public ResponseEntity<?> recommendForUser(@RequestBody Map<String, Long> request) {
+        Long userId = request.get("userId");
+        if (userId == null) {
+            return ResponseEntity.badRequest().body("userId는 필수입니다.");
+        }
+
+        int limit = 10;
+        List<BillDto> results = recommendationService.recommendForUser(userId, limit);
+        return ResponseEntity.ok(results);
+    }
+
 }
