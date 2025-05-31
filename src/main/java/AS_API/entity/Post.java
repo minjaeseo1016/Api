@@ -33,6 +33,11 @@ public class Post {
         this.postCount += 1;
     }
 
+    public void update(String postTitle, String content) {
+        this.postTitle = postTitle;
+        this.content = content;
+    }
+
     @PrePersist
     public void onCreate() {
         this.postDate = LocalDateTime.now();

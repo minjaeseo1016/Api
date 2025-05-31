@@ -36,10 +36,26 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(postId));
     }
 
- 
     @GetMapping("/my")
     public ResponseEntity<List<PostResponseDto>> getMyPosts(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUser().getUserId();
         return ResponseEntity.ok(postService.getMyPosts(userId));
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> updatePost(@PathVariable Long postId,
+                                        @RequestBody PostRequestDto requestDto,
+                                        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getUserId();
+        postService.updatePost(postId, userId, requestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId,
+                                        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getUserId();
+        postService.deletePost(postId, userId);
+        return ResponseEntity.ok().build();
     }
 }

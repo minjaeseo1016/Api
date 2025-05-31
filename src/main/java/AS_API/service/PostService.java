@@ -5,6 +5,7 @@ import AS_API.dto.PostResponseDto;
 import AS_API.entity.Post;
 import AS_API.entity.User;
 import AS_API.repository.PostRepository;
+import AS_API.repository.CommentRepository;
 import AS_API.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,12 +13,15 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.transaction.Transactional;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository; 
 
     public void createPost(Long userId, PostRequestDto dto) {
         User user = userRepository.findById(userId)
@@ -58,7 +62,6 @@ public class PostService {
             .build();
     }
 
-    
     public List<PostResponseDto> getMyPosts(Long userId) {
         return postRepository.findByUser_UserId(userId).stream()
             .map(post -> PostResponseDto.builder()
@@ -69,5 +72,32 @@ public class PostService {
                 .postDate(post.getPostDate())
                 .build())
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updatePost(Long postId, Long userId, PostRequestDto dto) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        if (!post.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
+
+        post.update(dto.getPostTitle(), dto.getContent());
+    }
+
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        if (!post.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("삭제 권한이 없습니다.");
+        }
+
+      
+        commentRepository.deleteByPost_PostId(postId);
+
+        postRepository.delete(post);
     }
 }

@@ -31,6 +31,10 @@ public class Comment {
 
     private LocalDateTime createdAt;
 
+    public void update(String commentContent) {
+        this.commentContent = commentContent;
+    }
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
