@@ -21,11 +21,12 @@ public class BillService {
     private final BillRepository billRepository;
     private final BillStatusRepository billStatusRepository;
 
-    public Page<BillDto> searchBills(String title, String proposer, String detail, Pageable pageable) {
+    public Page<BillDto> searchBills(String title, String proposer, String detail, String committee, Pageable pageable) {
         return billRepository.searchBills(
                 (title == null || title.trim().isEmpty()) ? null : title,
                 (proposer == null || proposer.trim().isEmpty()) ? null : proposer,
                 (detail == null || detail.trim().isEmpty()) ? null : detail,
+                (committee == null || committee.trim().isEmpty()) ? null : committee,
                 pageable
         );
     }

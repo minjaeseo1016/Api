@@ -17,12 +17,14 @@ public interface BillRepository extends JpaRepository<Bill, Long> {
     @Query("SELECT new AS_API.dto.BillDto(b.billId, b.apiId, b.billNumber, b.billTitle, " +
             "b.billProposer, b.committee, b.billStatus, b.proposer.poly) " +
             "FROM Bill b " +
-            "WHERE (:title IS NOT NULL AND b.billTitle LIKE CONCAT('%', :title, '%') OR :title IS NULL) " +
-            "AND (:proposer IS NOT NULL AND b.billProposer LIKE CONCAT('%', :proposer, '%') OR :proposer IS NULL) " +
-            "AND (:detail IS NOT NULL AND b.detail LIKE CONCAT('%', :detail, '%') OR :detail IS NULL)")
+            "WHERE (:title IS NULL OR b.billTitle LIKE CONCAT('%', :title, '%')) " +
+            "AND (:proposer IS NULL OR b.billProposer LIKE CONCAT('%', :proposer, '%')) " +
+            "AND (:detail IS NULL OR b.detail LIKE CONCAT('%', :detail, '%')) " +
+            "AND (:committee IS NULL OR b.committee LIKE CONCAT('%', :committee, '%'))")
     Page<BillDto> searchBills(@Param("title") String title,
                               @Param("proposer") String proposer,
                               @Param("detail") String detail,
+                              @Param("committee") String committee,
                               Pageable pageable);
 
     @Query("SELECT new AS_API.dto.BillDetailDto(b.billId, b.apiId, b.billNumber, b.billTitle, " +
