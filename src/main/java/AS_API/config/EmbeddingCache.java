@@ -24,20 +24,26 @@ public class EmbeddingCache {
 
     @PostConstruct
     public void preload() {
+        reloadCache();
+    }
+
+    public synchronized void reloadCache() {
         List<Bill> bills = billRepository.findAll();
 
+        List<Long> newIds = new ArrayList<>();
         List<float[]> vectorList = new ArrayList<>();
+
         for (Bill bill : bills) {
             float[] emb = bill.getEmbedding();
             if (emb != null && isValid(emb)) {
-                ids.add(bill.getBillId());
-                vectorList.add(normalize(emb)); // 정규화 보정
+                newIds.add(bill.getBillId());
+                vectorList.add(normalize(emb));
             }
         }
 
-        vectors = vectorList.toArray(new float[0][0]);
-
-        System.out.printf("✅ 임베딩 캐시 완료: %d개\n", ids.size());
+        this.ids = newIds;
+        this.vectors = vectorList.toArray(new float[0][0]);
+        System.out.printf("캐시 강제 갱신 완료: %d개 임베딩\n", ids.size());
     }
 
     private boolean isValid(float[] v) {

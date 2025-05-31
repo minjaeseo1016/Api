@@ -1,5 +1,6 @@
 package AS_API.controller;
 
+import AS_API.config.EmbeddingCache;
 import AS_API.dto.BillDto;
 import AS_API.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
+    private final EmbeddingCache embeddingCache;
 
     @PostMapping
     public ResponseEntity<?> recommend(@RequestBody Map<String, String> request) {
@@ -49,6 +51,12 @@ public class RecommendationController {
         int limit = 10;
         List<BillDto> results = recommendationService.recommendForUser(userId, limit);
         return ResponseEntity.ok(results);
+    }
+
+    @PostMapping("/refresh-cache")
+    public ResponseEntity<?> refreshEmbeddingCache() {
+        embeddingCache.reloadCache();
+        return ResponseEntity.ok("추천 임베딩 캐시가 갱신되었습니다.");
     }
 
 }
