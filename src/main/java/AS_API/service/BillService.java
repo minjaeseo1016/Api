@@ -4,10 +4,13 @@ import AS_API.dto.BillDto;
 import AS_API.dto.BillDetailDto;
 import AS_API.entity.Bill;
 import AS_API.repository.BillRepository;
+import AS_API.repository.BillStatusRepository;
+import AS_API.entity.BillStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BillService {
     private final BillRepository billRepository;
+    private final BillStatusRepository billStatusRepository;
 
     public Page<BillDto> searchBills(String title, String proposer, String detail, Pageable pageable) {
         return billRepository.searchBills(
@@ -26,7 +30,10 @@ public class BillService {
         );
     }
 
+    @Transactional
     public Optional<BillDetailDto> getBillDetail(Long billId) {
+        billStatusRepository.findByBill_BillId(billId)
+                .ifPresent(BillStatus::increaseBillCount);
         return billRepository.findBillDetailById(billId);
     }
 
