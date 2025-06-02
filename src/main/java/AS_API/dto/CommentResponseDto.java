@@ -1,5 +1,6 @@
 package AS_API.dto;
 
+import AS_API.entity.Comment;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,14 @@ public class CommentResponseDto {
         this.parentCommentId = parentCommentId;
         this.commentContent = commentContent;
         this.createdAt = createdAt;
+    }
+
+    public CommentResponseDto(Comment comment) {
+        this.commentId = comment.getCommentId();
+        this.postId = comment.getPost().getPostId();
+        this.parentCommentId = comment.getParentCommentId();
+        this.commentContent = comment.getCommentContent();
+        this.createdAt = comment.getCreatedAt();
     }
 
     public Long getCommentId() { return commentId; }
