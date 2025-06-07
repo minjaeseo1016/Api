@@ -20,4 +20,8 @@ public class BillDetailDto {
     private String summary;
     private String prediction;
     private String term;
+    private int yes;
+    private int no;
+    private int bookmarkCount;
+    private String poly;
 }
