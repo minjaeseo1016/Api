@@ -24,9 +24,8 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
 
-    // 신고 생성
-    public Report createReport(ReportRequestDto dto) {
-        User reporter = userRepository.findById(dto.getReporterId())
+    public Report createReport(Long reporterId, ReportRequestDto dto) {
+        User reporter = userRepository.findById(reporterId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         User target = userRepository.findById(dto.getTargetId())
@@ -43,7 +42,6 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    // 특정 사용자가 신고한 목록
     public List<Report> getReportsByUser(Long userId) {
         User reporter = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -51,7 +49,6 @@ public class ReportService {
         return reportRepository.findByReporter(reporter);
     }
 
-    // 특정 신고 ID로 신고 상세 조회
     public Report getReportById(Long reportId) {
         return reportRepository.findById(reportId)
                 .orElseThrow(() -> new CustomException(REPORT_NOT_FOUND));

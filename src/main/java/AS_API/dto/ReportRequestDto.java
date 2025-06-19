@@ -7,7 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ReportRequestDto {
-    private Long reporterId;
     private Long targetId;
     private String targetType;
     private String reason;
